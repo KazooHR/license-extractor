@@ -12,8 +12,21 @@ def extract_licenses(output_format):
     with open("kazoo-web-sbom.json", "r") as sbom_file:
         sbom_data = json.load(sbom_file)
 
-    package_licenses = {}
+    # This operates as a cache to store all gathered licenses
+    # for packages. There are two reasons for this:
+    # 1. To avoid fetching the same license multiple times for the same package from the NPM registry.
+    # 2. The primary output files have certain licenses filtered out but we still want a reference to all licenses.
+    kw_unfiltered_licenses_file = "kw-unfiltered-licenses.json"
+    
+    # Load all licenses if they exist
+    if os.path.exists(kw_unfiltered_licenses_file):
+        with open(kw_unfiltered_licenses_file, "r") as unfiltered_file:
+            package_licenses = json.load(unfiltered_file)
+    # Otherwise, create an empty dictionary
+    else:
+        package_licenses = {}
 
+    # Set the output file based on the user supplied argument
     if output_format == "json":
         output_file = "kw-licenses.json"
     elif output_format == "csv":
@@ -22,17 +35,11 @@ def extract_licenses(output_format):
         print("Invalid output format. Please specify either 'json' or 'csv'.")
         return
 
-    if os.path.exists(output_file):
-        if output_format == "json":
-            with open(output_file, "r") as existing_file:
-                package_licenses = json.load(existing_file)
-        elif output_format == "csv":
-            with open(output_file, "r") as existing_file:
-                reader = csv.DictReader(existing_file)
-                package_licenses = {row["Package Name"]: row["License"] for row in reader}
-
+    filtered_licenses = {}
     for package in sbom_data["packages"]:
+        # Skip packages we own or are part of the monorepo
         if package["name"] != "com.github.KazooHR/kazoo-web" and "@kazoohr/" not in package["name"] and not package["name"].startswith("actions:"):
+            # Only fetch licenses for packages we haven't already fetched
             if package["name"] not in package_licenses:
                 license_concluded = package.get("licenseConcluded", None)  # Get licenseConcluded, or None if missing
 
@@ -43,7 +50,9 @@ def extract_licenses(output_format):
 
                     if response.status_code == 200:
                         soup = BeautifulSoup(response.text, 'html.parser')
-
+                        # Scraping shenanigans to find the license
+                        # Huzzah!
+                        
                         # Find all <h3> License tags on the page
                         license_headers = soup.find_all('h3', text='License')
 
@@ -53,29 +62,40 @@ def extract_licenses(output_format):
                             license_text = license_header.find_next_sibling('p')
                             if license_text:
                                 license_concluded = license_text.text.strip()
-                                break  # Stop looping after finding the license
+                                break
 
-                        if license_concluded is None:  # If no valid license is found
+                        if license_concluded is None:  
                             license_concluded = "LICENSE NOT FOUND"
                             print(f"License not found for package: {package['name']} (URL: {npm_url})")
 
                     else:
+                        # It is useful to know if we failed to fetch the license
+                        # Likely this means the HTML scraping code needs to be updated
                         license_concluded = "LICENSE FETCH ERROR"
                         print(f"Error fetching license for package: {package['name']} (URL: {npm_url})")  # Print the URL
 
                 package_licenses[package["name"]] = license_concluded
 
-                # Throttle requests (adjust the delay as needed)
-                time.sleep(1)  # Wait for 1 second
+                # Filter for licenses NOT containing "MIT" or "Apache 2.0"
+                if "MIT" not in license_concluded and "Apache 2.0" not in license_concluded:
+                    filtered_licenses[package["name"]] = license_concluded
 
+                # Throttle requests (adjust the delay as needed)
+                time.sleep(3)  # Wait for 1 second
+
+    # Always write to kw-unfiltered-licenses.json
+    with open(kw_unfiltered_licenses_file, "w") as unfiltered_file:
+        json.dump(package_licenses, unfiltered_file, indent=4)
+
+    # Write filtered licenses to the specified format
     if output_format == "json":
-        with open("kw-licenses.json", "w") as licenses_file:
-            json.dump(package_licenses, licenses_file, indent=4)
+        with open(output_file, "w") as licenses_file:
+            json.dump(filtered_licenses, licenses_file, indent=4)
     elif output_format == "csv":
-        with open("kw-licenses.csv", "w", newline="") as licenses_file:
+        with open(output_file, "w", newline="") as licenses_file:
             csv_writer = csv.DictWriter(licenses_file, fieldnames=["Package Name", "License"])
             csv_writer.writeheader()
-            for package_name, license_concluded in package_licenses.items():
+            for package_name, license_concluded in filtered_licenses.items():
                 csv_writer.writerow({"Package Name": package_name, "License": license_concluded})
     else:
         print("Invalid output format. Please specify either 'json' or 'csv'.")
