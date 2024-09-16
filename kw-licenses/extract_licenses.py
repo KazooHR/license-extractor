@@ -9,27 +9,27 @@ import os
 LICENSE_NOT_FOUND = "LICENSE NOT FOUND"
 LICENSE_FETCH_ERROR = "LICENSE FETCH ERROR"
 
-def extract_licenses(output_format, base_path):
+def extract_licenses(output_format, base_path, filter_type="filtered"):
     """Extracts license information from sbom.json and creates a file in the specified format."""
 
     sbom_path = os.path.join(base_path, "sbom.json")  # Construct path to sbom.json
-    unfiltered_licenses_path = os.path.join(base_path, "unfiltered-licenses.json")
+    licenses_cache_path = os.path.join(base_path, "licenses-cache.json")
 
     with open(sbom_path, "r") as sbom_file:
         sbom_data = json.load(sbom_file)
 
     # Load all licenses if they exist
-    if os.path.exists(unfiltered_licenses_path):
-        with open(unfiltered_licenses_path, "r") as unfiltered_file:
+    if os.path.exists(licenses_cache_path):
+        with open(licenses_cache_path, "r") as unfiltered_file:
             package_licenses = json.load(unfiltered_file)
     else:
         package_licenses = {}
 
     # Set the output file based on the user supplied argument
     if output_format == "json":
-        output_file = os.path.join(base_path, "filtered-licenses.json")  # Construct path
+        output_file = os.path.join(base_path, f"licenses-{filter_type}.json")  # Construct path
     elif output_format == "csv":
-        output_file = os.path.join(base_path, "filtered-licenses.csv")  # Construct path
+        output_file = os.path.join(base_path, f"licenses-{filter_type}.csv")  # Construct path
     else:
         print("Invalid output format. Please specify either 'json' or 'csv'.")
         return
@@ -85,18 +85,19 @@ def extract_licenses(output_format, base_path):
 
             package_licenses[package["name"]] = license_concluded
 
-            # Filter for licenses NOT containing "MIT" or "Apache-2.0"
-            if "MIT" not in license_concluded and "Apache-2.0" not in license_concluded:
-                # Create a dictionary for each package
-                package_info = {
-                    "Package Name": package_name_without_npm, 
-                    "License": license_concluded,
-                    "URL": f"https://npmjs.com/package/{package_name_without_npm}" 
-                }
+            # Create a dictionary for each package
+            package_info = {
+                "Package Name": package_name_without_npm, 
+                "License": license_concluded,
+                "URL": f"https://npmjs.com/package/{package_name_without_npm}" 
+            }
+
+            # Filter for licenses NOT containing "MIT" or "Apache-2.0" if filter_type is "filtered"
+            if filter_type == "unfiltered" or ("MIT" not in license_concluded and "Apache-2.0" not in license_concluded):
                 filtered_licenses.append(package_info)
 
     # Always write to unfiltered-licenses.json
-    with open(unfiltered_licenses_path, "w") as unfiltered_file:
+    with open(licenses_cache_path, "w") as unfiltered_file:
         json.dump(package_licenses, unfiltered_file, indent=4)
 
     # Write filtered licenses to the specified format
@@ -114,8 +115,9 @@ def extract_licenses(output_format, base_path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Extract license information from SBOM.")
-    parser.add_argument("output_format", choices=["json", "csv"], help="Output format (json or csv)")
-    parser.add_argument("base_path", default=os.getcwd(), nargs='?', help="Path to the directory containing sbom.json and other files. Defaults to current directory.")
+    parser.add_argument("--output_format", choices=["json", "csv"], required=True, help="Output format (json or csv)")
+    parser.add_argument("--base_path", default=os.getcwd(), help="Path to the directory containing sbom.json and other files. Defaults to current directory.")
+    parser.add_argument("--filter_type", choices=["filtered", "unfiltered"], default="filtered", help="Filter licenses (filtered or unfiltered). Defaults to filtered.")
     args = parser.parse_args()
 
-    extract_licenses(args.output_format, args.base_path)
+    extract_licenses(args.output_format, args.base_path, args.filter_type)
