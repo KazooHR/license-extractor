@@ -9,41 +9,37 @@ import os
 LICENSE_NOT_FOUND = "LICENSE NOT FOUND"
 LICENSE_FETCH_ERROR = "LICENSE FETCH ERROR"
 
-def extract_licenses(output_format):
+def extract_licenses(output_format, base_path):
     """Extracts license information from sbom.json and creates a file in the specified format."""
 
-    with open("sbom.json", "r") as sbom_file:
+    sbom_path = os.path.join(base_path, "sbom.json")  # Construct path to sbom.json
+    unfiltered_licenses_path = os.path.join(base_path, "unfiltered-licenses.json")
+
+    with open(sbom_path, "r") as sbom_file:
         sbom_data = json.load(sbom_file)
 
-    # This operates as a cache to store all gathered licenses
-    # for packages. There are two reasons for this:
-    # 1. To avoid fetching the same license multiple times for the same package from the NPM registry.
-    # 2. The primary output files have certain licenses filtered out but we still want a reference to all licenses.
-    kw_unfiltered_licenses_file = "unfiltered-licenses.json"
-    
     # Load all licenses if they exist
-    if os.path.exists(kw_unfiltered_licenses_file):
-        with open(kw_unfiltered_licenses_file, "r") as unfiltered_file:
+    if os.path.exists(unfiltered_licenses_path):
+        with open(unfiltered_licenses_path, "r") as unfiltered_file:
             package_licenses = json.load(unfiltered_file)
-    # Otherwise, create an empty dictionary
     else:
         package_licenses = {}
 
     # Set the output file based on the user supplied argument
     if output_format == "json":
-        output_file = "filtered-licenses.json"
+        output_file = os.path.join(base_path, "filtered-licenses.json")  # Construct path
     elif output_format == "csv":
-        output_file = "filtered-licenses.csv"
+        output_file = os.path.join(base_path, "filtered-licenses.csv")  # Construct path
     else:
         print("Invalid output format. Please specify either 'json' or 'csv'.")
         return
 
-    filtered_licenses = [] 
+    filtered_licenses = []
     for package in sbom_data["packages"]:
         # Skip packages we own or are part of the monorepo
         # The kazooohr with triple "o" is not a typo
         if package["name"] != "com.github.KazooHR/kazoo-web" and "@kazooohr/" not in package["name"] and "@kazoohr/" not in package["name"] and not package["name"].startswith("actions:"):
-            package_name_without_npm = package["name"].replace("npm:", "") # Move declaration here
+            package_name_without_npm = package["name"].replace("npm:", "") 
             license_concluded = None
             # Check if license is already in the package
             if "licenseConcluded" in package:
@@ -61,8 +57,6 @@ def extract_licenses(output_format):
 
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, 'html.parser')
-                    # Scraping shenanigans to find the license
-                    # Huzzah!
                     
                     # Find all <h3> License tags on the page
                     license_headers = soup.find_all('h3', text='License')
@@ -95,14 +89,14 @@ def extract_licenses(output_format):
             if "MIT" not in license_concluded and "Apache-2.0" not in license_concluded:
                 # Create a dictionary for each package
                 package_info = {
-                    "Package Name": package_name_without_npm,  # Reuse the variable
+                    "Package Name": package_name_without_npm, 
                     "License": license_concluded,
-                    "URL": f"https://npmjs.com/package/{package_name_without_npm}"  # Reuse the variable
+                    "URL": f"https://npmjs.com/package/{package_name_without_npm}" 
                 }
                 filtered_licenses.append(package_info)
 
     # Always write to unfiltered-licenses.json
-    with open(kw_unfiltered_licenses_file, "w") as unfiltered_file:
+    with open(unfiltered_licenses_path, "w") as unfiltered_file:
         json.dump(package_licenses, unfiltered_file, indent=4)
 
     # Write filtered licenses to the specified format
@@ -121,6 +115,7 @@ def extract_licenses(output_format):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Extract license information from SBOM.")
     parser.add_argument("output_format", choices=["json", "csv"], help="Output format (json or csv)")
+    parser.add_argument("base_path", default=os.getcwd(), nargs='?', help="Path to the directory containing sbom.json and other files. Defaults to current directory.")
     args = parser.parse_args()
 
-    extract_licenses(args.output_format)
+    extract_licenses(args.output_format, args.base_path)
