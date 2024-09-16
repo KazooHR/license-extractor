@@ -38,7 +38,7 @@ def extract_licenses(output_format, base_path, filter_type="filtered"):
     for package in sbom_data["packages"]:
         # Skip packages we own or are part of the monorepo
         # The kazooohr with triple "o" is not a typo
-        if package["name"] != "com.github.KazooHR/kazoo-web" and "@kazooohr/" not in package["name"] and "@kazoohr/" not in package["name"] and not package["name"].startswith("actions:"):
+        if "kazooohr" not in package["name"].lower() and "kazoohr" not in package["name"].lower() and "worktango" not in package["name"].lower() and not package["name"].startswith("actions:"):
             package_name_without_npm = package["name"].replace("npm:", "") 
             license_concluded = None
             # Check if license is already in the package
@@ -81,7 +81,7 @@ def extract_licenses(output_format, base_path, filter_type="filtered"):
                     print(f"Error fetching license for package: {package['name']} (URL: {npm_url})")  # Print the URL
 
                 # Throttle requests (adjust the delay as needed)
-                time.sleep(3)  # Wait for 1 second
+                time.sleep(3) 
 
             package_licenses[package["name"]] = license_concluded
 
