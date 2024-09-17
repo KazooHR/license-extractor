@@ -9,10 +9,67 @@ import os
 LICENSE_NOT_FOUND = "LICENSE NOT FOUND"
 LICENSE_FETCH_ERROR = "LICENSE FETCH ERROR"
 
-def extract_licenses(output_format, base_path, filter_type="filtered"):
+def fetch_license_from_npm(package_name):
+    """Fetches license information from the NPM registry."""
+
+    npm_url = f"https://npmjs.com/{package_name}"
+    response = requests.get(npm_url)
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # Find all <h3> License tags on the page
+        license_headers = soup.find_all('h3', text='License')
+
+        # Loop through each license header
+        for license_header in license_headers:
+            # Check for a sibling <p> containing license text
+            license_text = license_header.find_next_sibling('p')
+            if license_text:
+                return license_text.text.strip()
+
+        print(f"License not found for package: {package_name} (URL: {npm_url})")
+        return LICENSE_NOT_FOUND
+
+    else:
+        print(response)
+        print(f"Error fetching license for package: {package_name} (URL: {npm_url})")
+        return LICENSE_FETCH_ERROR
+
+def fetch_license_from_rubygems(package_name):
+    """Fetches license information from the RubyGems registry."""
+
+    # Strip out "rubygems:" prefix if present
+    package_name = package_name.replace("rubygems:", "")
+
+    rubygems_url = f"https://rubygems.org/gems/{package_name}"
+    response = requests.get(rubygems_url)
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # Find the <span> with class 'gem__ruby-version'
+        license_header = soup.find('span', class_='gem__ruby-version') 
+
+        if license_header:
+            # Find the child <p> tag within the <span>
+            license_text = license_header.find('p')
+            if license_text:
+                return license_text.text.strip()
+
+        print(f"License not found for package: {package_name} (URL: {rubygems_url})")
+        return LICENSE_NOT_FOUND
+
+    else:
+        print(response)
+        print(f"Error fetching license for package: {package_name} (URL: {rubygems_url})")
+        return LICENSE_FETCH_ERROR
+
+
+def extract_licenses(output_format, base_path, filter_type="filtered", registry="npm"):
     """Extracts license information from sbom.json and creates a file in the specified format."""
 
-    sbom_path = os.path.join(base_path, "sbom.json")  # Construct path to sbom.json
+    sbom_path = os.path.join(base_path, "sbom.json")
     licenses_cache_path = os.path.join(base_path, "licenses-cache.json")
 
     with open(sbom_path, "r") as sbom_file:
@@ -51,37 +108,16 @@ def extract_licenses(output_format, base_path, filter_type="filtered"):
             
             # If license is not in either, or is marked as "LICENSE NOT FOUND" or "LICENSE FETCH ERROR", fetch it
             else:
-                # Fetch license information from NPM registry
-                npm_url = f"https://npmjs.com/{package_name_without_npm}"  # Remove "npm:" prefix if present
-                response = requests.get(npm_url)
-
-                if response.status_code == 200:
-                    soup = BeautifulSoup(response.text, 'html.parser')
-                    
-                    # Find all <h3> License tags on the page
-                    license_headers = soup.find_all('h3', text='License')
-
-                    # Loop through each license header
-                    for license_header in license_headers:
-                        # Check for a sibling <p> containing license text
-                        license_text = license_header.find_next_sibling('p')
-                        if license_text:
-                            license_concluded = license_text.text.strip()
-                            break
-
-                    if license_concluded is None:  
-                        license_concluded = LICENSE_NOT_FOUND
-                        print(f"License not found for package: {package['name']} (URL: {npm_url})")
-
+                if registry == "npm":
+                    license_concluded = fetch_license_from_npm(package_name_without_npm)
+                elif registry == "rubygem":
+                    license_concluded = fetch_license_from_rubygems(package_name_without_npm)
                 else:
-                    # It is useful to know if we failed to fetch the license
-                    # Likely this means the HTML scraping code needs to be updated
-                    print(response)
-                    license_concluded = LICENSE_FETCH_ERROR
-                    print(f"Error fetching license for package: {package['name']} (URL: {npm_url})")  # Print the URL
+                    print(f"Unsupported registry: {registry}")
+                    return
 
                 # Throttle requests (adjust the delay as needed)
-                time.sleep(3) 
+                time.sleep(3)
 
             package_licenses[package["name"]] = license_concluded
 
@@ -89,7 +125,7 @@ def extract_licenses(output_format, base_path, filter_type="filtered"):
             package_info = {
                 "Package Name": package_name_without_npm, 
                 "License": license_concluded,
-                "URL": f"https://npmjs.com/package/{package_name_without_npm}" 
+                "URL": f"https://npmjs.com/package/{package_name_without_npm}" if registry == "npm" else f"https://rubygems.org/gems/{package_name_without_npm}"
             }
 
             # Filter for licenses NOT containing "MIT" or "Apache-2.0" if filter_type is "filtered"
@@ -118,6 +154,7 @@ if __name__ == "__main__":
     parser.add_argument("--output_format", choices=["json", "csv"], required=True, help="Output format (json or csv)")
     parser.add_argument("--base_path", default=os.getcwd(), help="Path to the directory containing sbom.json and other files. Defaults to current directory.")
     parser.add_argument("--filter_type", choices=["filtered", "unfiltered"], default="filtered", help="Filter licenses (filtered or unfiltered). Defaults to filtered.")
+    parser.add_argument("--registry", choices=["npm", "rubygem"], default="npm", help="Package registry to use for fetching license information. Defaults to npm.") 
     args = parser.parse_args()
 
-    extract_licenses(args.output_format, args.base_path, args.filter_type)
+    extract_licenses(args.output_format, args.base_path, args.filter_type, args.registry)
