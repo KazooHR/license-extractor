@@ -66,7 +66,7 @@ def fetch_license_from_rubygems(package_name):
         return LICENSE_FETCH_ERROR
 
 
-def extract_licenses(output_format, base_path, filter_type="filtered", registry="npm"):
+def extract_licenses(output_format, base_path, filter_type="filtered"):
     """Extracts license information from sbom.json and creates a file in the specified format."""
 
     sbom_path = os.path.join(base_path, "sbom.json")
@@ -94,10 +94,10 @@ def extract_licenses(output_format, base_path, filter_type="filtered", registry=
     filtered_licenses = []
     for package in sbom_data["packages"]:
         # Skip packages we own or are part of the monorepo
-        # The kazooohr with triple "o" is not a typo
         if "kazooohr" not in package["name"].lower() and "kazoohr" not in package["name"].lower() and "worktango" not in package["name"].lower() and not package["name"].startswith("actions:"):
-            package_name_without_npm = package["name"].replace("npm:", "") 
+            package_name_without_prefix = package["name"].replace("npm:", "").replace("rubygems:", "")
             license_concluded = None
+
             # Check if license is already in the package
             if "licenseConcluded" in package:
                 license_concluded = package["licenseConcluded"]
@@ -108,13 +108,13 @@ def extract_licenses(output_format, base_path, filter_type="filtered", registry=
             
             # If license is not in either, or is marked as "LICENSE NOT FOUND" or "LICENSE FETCH ERROR", fetch it
             else:
-                if registry == "npm":
-                    license_concluded = fetch_license_from_npm(package_name_without_npm)
-                elif registry == "rubygem":
-                    license_concluded = fetch_license_from_rubygems(package_name_without_npm)
+                if package["name"].startswith("npm:"):
+                    license_concluded = fetch_license_from_npm(package_name_without_prefix)
+                elif package["name"].startswith("rubygems:"):
+                    license_concluded = fetch_license_from_rubygems(package_name_without_prefix)
                 else:
-                    print(f"Unsupported registry: {registry}")
-                    return
+                    print(f"Unsupported package prefix: {package['name']}")
+                    continue  # Skip this package if the prefix is not recognized
 
                 # Throttle requests (adjust the delay as needed)
                 time.sleep(3)
@@ -123,9 +123,9 @@ def extract_licenses(output_format, base_path, filter_type="filtered", registry=
 
             # Create a dictionary for each package
             package_info = {
-                "Package Name": package_name_without_npm, 
+                "Package Name": package_name_without_prefix, 
                 "License": license_concluded,
-                "URL": f"https://npmjs.com/package/{package_name_without_npm}" if registry == "npm" else f"https://rubygems.org/gems/{package_name_without_npm}"
+                "URL": f"https://npmjs.com/package/{package_name_without_prefix}" if package["name"].startswith("npm:") else f"https://rubygems.org/gems/{package_name_without_prefix}"
             }
 
             # Filter for licenses NOT containing "MIT" or "Apache-2.0" if filter_type is "filtered"
@@ -154,7 +154,6 @@ if __name__ == "__main__":
     parser.add_argument("--output_format", choices=["json", "csv"], required=True, help="Output format (json or csv)")
     parser.add_argument("--base_path", default=os.getcwd(), help="Path to the directory containing sbom.json and other files. Defaults to current directory.")
     parser.add_argument("--filter_type", choices=["filtered", "unfiltered"], default="filtered", help="Filter licenses (filtered or unfiltered). Defaults to filtered.")
-    parser.add_argument("--registry", choices=["npm", "rubygem"], default="npm", help="Package registry to use for fetching license information. Defaults to npm.") 
     args = parser.parse_args()
 
-    extract_licenses(args.output_format, args.base_path, args.filter_type, args.registry)
+    extract_licenses(args.output_format, args.base_path, args.filter_type)
