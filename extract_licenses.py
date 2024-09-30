@@ -9,6 +9,91 @@ import os
 LICENSE_NOT_FOUND = "LICENSE NOT FOUND"
 LICENSE_FETCH_ERROR = "LICENSE FETCH ERROR"
 
+def extract_licenses(output_format, base_path, filter_type="filtered"):
+    """Extracts license information from sbom.json and creates a file in the specified format."""
+
+    sbom_path = os.path.join(base_path, "sbom.json")
+    licenses_cache_path = os.path.join(base_path, "licenses-cache.json")
+
+    with open(sbom_path, "r") as sbom_file:
+        sbom_data = json.load(sbom_file)
+
+    # Load all licenses if they exist
+    if os.path.exists(licenses_cache_path):
+        with open(licenses_cache_path, "r") as unfiltered_file:
+            package_licenses = json.load(unfiltered_file)
+    else:
+        package_licenses = {}
+
+    # Set the output file based on the user supplied argument
+    if output_format == "json":
+        output_file = os.path.join(base_path, f"licenses-{filter_type}.json")  # Construct path
+    elif output_format == "csv":
+        output_file = os.path.join(base_path, f"licenses-{filter_type}.csv")  # Construct path
+    else:
+        print("Invalid output format. Please specify either 'json' or 'csv'.")
+        return
+
+    filtered_licenses = []
+    for package in sbom_data["packages"]:
+        # Skip packages we own or are part of the monorepo
+        if "kazooohr" not in package["name"].lower() and "kazoohr" not in package["name"].lower() and "worktango" not in package["name"].lower() and not package["name"].startswith("actions:"):
+            license_concluded = None
+
+            # Check if license is already in the package
+            if "licenseConcluded" in package:
+                license_concluded = package["licenseConcluded"]
+                
+            # Check if license is in the cache and it's not already marked as "LICENSE NOT FOUND" or "LICENSE FETCH ERROR"
+            elif package["name"] in package_licenses and package_licenses[package["name"]] not in [LICENSE_NOT_FOUND, LICENSE_FETCH_ERROR]:
+                license_concluded = package_licenses[package["name"]]
+            
+            # If license is not in either, or is marked as "LICENSE NOT FOUND" or "LICENSE FETCH ERROR", fetch it
+            else:
+                """
+                Package names are prefixed with npm:, rubygems:, github:, etc.
+                We need need the actual package name without prefix
+                """
+                package_name_without_prefix = package["name"].split(":", 1)[1]
+                if package["name"].startswith("npm:"):
+                    license_concluded = fetch_license_from_npm(package_name_without_prefix)
+                elif package["name"].startswith("rubygems:"):
+                    license_concluded = fetch_license_from_rubygems(package_name_without_prefix)
+                elif package["name"].startswith("swift:"):
+                    license_concluded = fetch_license_from_github_for_swift_packages(package_name_without_prefix)
+                else:
+                    print(f"Unsupported package prefix: {package['name']}")
+                    continue  # Skip this package if the prefix is not recognized
+
+                # Throttle requests (adjust the delay as needed)
+                time.sleep(3)
+
+            package_licenses[package["name"]] = license_concluded
+
+            # Create a dictionary for each package
+            package_info = build_package_info(package, license_concluded)
+
+            # Filter for licenses NOT containing "MIT" or "Apache-2.0" if filter_type is "filtered"
+            if filter_type == "unfiltered" or ("MIT" not in license_concluded and "Apache-2.0" not in license_concluded):
+                filtered_licenses.append(package_info)
+
+    # Always write to unfiltered-licenses.json
+    with open(licenses_cache_path, "w") as unfiltered_file:
+        json.dump(package_licenses, unfiltered_file, indent=4)
+
+    # Write filtered licenses to the specified format
+    if output_format == "json":
+        with open(output_file, "w") as licenses_file:
+            json.dump(filtered_licenses, licenses_file, indent=4)  # Dump the list of dictionaries
+    elif output_format == "csv":
+        with open(output_file, "w", newline="") as licenses_file:
+            csv_writer = csv.DictWriter(licenses_file, fieldnames=["Package Name", "License", "URL"])  # Add URL field
+            csv_writer.writeheader()
+            for package_info in filtered_licenses:
+                csv_writer.writerow(package_info)
+    else:
+        print("Invalid output format. Please specify either 'json' or 'csv'.")
+
 def fetch_license_from_npm(package_name):
     """Fetches license information from the NPM registry."""
 
@@ -64,90 +149,72 @@ def fetch_license_from_rubygems(package_name):
         print(response)
         print(f"Error fetching license for package: {package_name} (URL: {rubygems_url})")
         return LICENSE_FETCH_ERROR
+    
+def fetch_license_from_github_for_swift_packages(package_name):
+    """
+    Fetches license information from GitHub.
+    Swift packages names seem to already be GitHub URLs
+    so all we need to add is the schema
+    """
 
+    github_package = f"https://{package_name}"
+    response = requests.get(github_package)
 
-def extract_licenses(output_format, base_path, filter_type="filtered"):
-    """Extracts license information from sbom.json and creates a file in the specified format."""
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, 'html.parser')
 
-    sbom_path = os.path.join(base_path, "sbom.json")
-    licenses_cache_path = os.path.join(base_path, "licenses-cache.json")
+        """
+        Find the HTML that contians the text 'license'
+        At the time of this writing would be in this format:
+         <span data-component="text" data-content="MIT license">MIT license</span>
+        """
+        license_span = soup.find('span', attrs={'data-content': lambda x: x and 'license' in x})
+        if license_span:
+            return license_span.text.strip()
 
-    with open(sbom_path, "r") as sbom_file:
-        sbom_data = json.load(sbom_file)
+        print(f"License not found for package: {package_name} (URL: {github_package})")
+        return LICENSE_NOT_FOUND
 
-    # Load all licenses if they exist
-    if os.path.exists(licenses_cache_path):
-        with open(licenses_cache_path, "r") as unfiltered_file:
-            package_licenses = json.load(unfiltered_file)
     else:
-        package_licenses = {}
+        print(response)
+        print(f"Error fetching license for package: {package_name} (URL: {github_package})")
+        return LICENSE_FETCH_ERROR
 
-    # Set the output file based on the user supplied argument
-    if output_format == "json":
-        output_file = os.path.join(base_path, f"licenses-{filter_type}.json")  # Construct path
-    elif output_format == "csv":
-        output_file = os.path.join(base_path, f"licenses-{filter_type}.csv")  # Construct path
-    else:
-        print("Invalid output format. Please specify either 'json' or 'csv'.")
-        return
+def build_package_info(package, license_concluded):
+    """
+    Builds a dictionary containing package information, including the URL based on the package prefix.
 
-    filtered_licenses = []
-    for package in sbom_data["packages"]:
-        # Skip packages we own or are part of the monorepo
-        if "kazooohr" not in package["name"].lower() and "kazoohr" not in package["name"].lower() and "worktango" not in package["name"].lower() and not package["name"].startswith("actions:"):
-            package_name_without_prefix = package["name"].replace("npm:", "").replace("rubygems:", "")
-            license_concluded = None
+    Args:
+        package: A dictionary containing package details, including the "name" key.
+        package_name_without_prefix: The package name without any prefix.
+        license_concluded: The concluded license for the package.
 
-            # Check if license is already in the package
-            if "licenseConcluded" in package:
-                license_concluded = package["licenseConcluded"]
-                
-            # Check if license is in the cache and it's not already marked as "LICENSE NOT FOUND" or "LICENSE FETCH ERROR"
-            elif package["name"] in package_licenses and package_licenses[package["name"]] not in [LICENSE_NOT_FOUND, LICENSE_FETCH_ERROR]:
-                license_concluded = package_licenses[package["name"]]
-            
-            # If license is not in either, or is marked as "LICENSE NOT FOUND" or "LICENSE FETCH ERROR", fetch it
-            else:
-                if package["name"].startswith("npm:"):
-                    license_concluded = fetch_license_from_npm(package_name_without_prefix)
-                elif package["name"].startswith("rubygems:"):
-                    license_concluded = fetch_license_from_rubygems(package_name_without_prefix)
-                else:
-                    print(f"Unsupported package prefix: {package['name']}")
-                    continue  # Skip this package if the prefix is not recognized
+    Returns:
+        A dictionary containing package information, including "Package Name", "License", and "URL".
+    """
 
-                # Throttle requests (adjust the delay as needed)
-                time.sleep(3)
+    package_name_without_prefix = package["name"].split(":", 1)[1] 
+    package_info = {
+        "Package Name": package_name_without_prefix, 
+        "License": license_concluded
+    }
 
-            package_licenses[package["name"]] = license_concluded
+    url_formats = {
+        "npm:": "https://npmjs.com/package/{package_name}",
+        "gem:": "https://rubygems.org/gems/{package_name}",
+        "swift": "https://github.com/{package_name}"
+        # Add more mappings here as needed
+    }
 
-            # Create a dictionary for each package
-            package_info = {
-                "Package Name": package_name_without_prefix, 
-                "License": license_concluded,
-                "URL": f"https://npmjs.com/package/{package_name_without_prefix}" if package["name"].startswith("npm:") else f"https://rubygems.org/gems/{package_name_without_prefix}"
-            }
+    for prefix, url_format in url_formats.items():
+        if package["name"].startswith(prefix):
+            package_info["URL"] = url_format.format(package_name=package_name_without_prefix)
+            break
 
-            # Filter for licenses NOT containing "MIT" or "Apache-2.0" if filter_type is "filtered"
-            if filter_type == "unfiltered" or ("MIT" not in license_concluded and "Apache-2.0" not in license_concluded):
-                filtered_licenses.append(package_info)
+    if "URL" not in package_info:
+        raise ValueError(f"No matching URL format found for package prefix in '{package['name']}'")
 
-    # Always write to unfiltered-licenses.json
-    with open(licenses_cache_path, "w") as unfiltered_file:
-        json.dump(package_licenses, unfiltered_file, indent=4)
-
-    # Write filtered licenses to the specified format
-    if output_format == "json":
-        with open(output_file, "w") as licenses_file:
-            json.dump(filtered_licenses, licenses_file, indent=4)  # Dump the list of dictionaries
-    elif output_format == "csv":
-        with open(output_file, "w", newline="") as licenses_file:
-            csv_writer = csv.DictWriter(licenses_file, fieldnames=["Package Name", "License", "URL"])  # Add URL field
-            csv_writer.writeheader()
-            for package_info in filtered_licenses:
-                csv_writer.writerow(package_info)
-    else:
-        print("Invalid output format. Please specify either 'json' or 'csv'.")
+    return package_info
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Extract license information from SBOM.")

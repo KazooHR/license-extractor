@@ -1,0 +1,33 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "creationInfo": {
+    "created": "2024-09-25T20:29:25Z",
+    "creators": [
+      "Tool: GitHub.com-Dependency-Graph"
+    ]
+  },
+  "dataLicense": "CC0-1.0",
+  "documentDescribes": [
+    "SPDXRef-com.github.KazooHR-mobile-ios"
+  ],
+  "documentNamespace": "https://github.com/KazooHR/mobile-ios/dependency_graph/sbom-0151520cc13d71ee",
+  "name": "com.github.KazooHR/mobile-ios",
+  "packages": [
+    {
+      "downloadLocation": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceLocator": "pkg:swift/github.com%2Fkishikawakatsumi%2Fkeychainaccess@4.2.2",
+          "referenceType": "purl"
+        }
+      ],
+      "filesAnalyzed": false,
+      "name": "swift:github.com/kishikawakatsumi/keychainaccess",
+      "SPDXID": "SPDXRef-swift-github.com-kishikawakatsumi-keychainaccess-4.2.2",
+      "supplier": "NOASSERTION",
+      "versionInfo": "4.2.2"
+    }
+  ],
+  "spdxVersion": "SPDX-2.3"
+}
