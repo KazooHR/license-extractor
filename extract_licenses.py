@@ -201,7 +201,7 @@ def build_package_info(package, license_concluded):
 
     url_formats = {
         "npm:": "https://npmjs.com/package/{package_name}",
-        "gem:": "https://rubygems.org/gems/{package_name}",
+        "rubygems:": "https://rubygems.org/gems/{package_name}",
         "swift": "https://github.com/{package_name}"
         # Add more mappings here as needed
     }
@@ -212,14 +212,14 @@ def build_package_info(package, license_concluded):
             break
 
     if "URL" not in package_info:
-        raise ValueError(f"No matching URL format found for package prefix in '{package['name']}'")
+        raise ValueError(f"No matching URL format found for package prefix in '{package['name']}'. Does the URL format need to be added to the 'url_formats' dictionary?")
 
     return package_info
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Extract license information from SBOM.")
-    parser.add_argument("--output_format", choices=["json", "csv"], required=True, help="Output format (json or csv)")
-    parser.add_argument("--base_path", default=os.getcwd(), help="Path to the directory containing sbom.json and other files. Defaults to current directory.")
+    parser.add_argument("--output_format", default="csv", choices=["json", "csv"], help="Output format (json or csv)")
+    parser.add_argument("--base_path", required=True, help="Path to the directory containing sbom.json and other files. Defaults to current directory.")
     parser.add_argument("--filter_type", choices=["filtered", "unfiltered"], default="filtered", help="Filter licenses (filtered or unfiltered). Defaults to filtered.")
     args = parser.parse_args()
 
