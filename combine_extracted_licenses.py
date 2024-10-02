@@ -2,7 +2,7 @@ import os
 import csv
 import argparse
 
-def centralize_licenses(main_directory=".", filtered=True, output_file="combined_licenses.csv"):
+def centralize_licenses(main_directory=".", filtered=True,):
     """
     Centralizes license data from multiple CSV files in subdirectories.
 
@@ -14,16 +14,18 @@ def centralize_licenses(main_directory=".", filtered=True, output_file="combined
 
     unique_packages = {}
 
-    input_filename = "licenses-filtered.csv" if filtered else "licenses-unfiltered.csv" # Use a string for the filename
+    input_filename = "licenses-filtered.csv" if filtered else "licenses-unfiltered.csv" 
+    output_filename = "combined-filtered-licenses.csv" if filtered else "combined-unfiltered-licenses.csv"
+    print(f"Combining {"filtered" if filtered else "unfiltered"} files")
 
     # Iterate through each subdirectory
     for subdir in os.listdir(main_directory):
         subdir_path = os.path.join(main_directory, subdir)
         if os.path.isdir(subdir_path):
-            csv_file_path = os.path.join(subdir_path, input_filename) # Use the filename string here
+            csv_file_path = os.path.join(subdir_path, input_filename)
             print(f"Processing: {csv_file_path}")
             if os.path.exists(csv_file_path):
-                with open(csv_file_path, 'r') as input_file_handle: # Rename the variable for clarity
+                with open(csv_file_path, 'r') as input_file_handle:
                     reader = csv.reader(input_file_handle)
                     next(reader)  # Skip header row
 
@@ -43,8 +45,11 @@ def centralize_licenses(main_directory=".", filtered=True, output_file="combined
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Centralize license data from CSV files in subdirectories.")
     parser.add_argument("-d", "--main_directory", default=".", help="Path to the main directory containing subdirectories. Defaults to the current directory.")
-    parser.add_argument("-f", "--filtered", action='store_true', help="Combine filtered License files from subdirectories.") # Use action='store_true' for boolean flags
+    parser.add_argument("-u", "--unfiltered", action='store_true', help="Combine unfiltered License files from subdirectories.") # Use -u for unfiltered
     parser.add_argument("-o", "--output_file", default="licenses_combined.csv", help="Name of the centralized CSV file to store all data. Defaults to 'licenses_combined.csv'.")
     args = parser.parse_args()
 
-    centralize_licenses(args.main_directory, args.filtered, args.output_file)
+    # Set filtered to False only if -u or --unfiltered is provided
+    filtered = not args.unfiltered 
+
+    centralize_licenses(args.main_directory, filtered, args.output_file)
