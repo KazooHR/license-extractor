@@ -1,0 +1,10 @@
+Package Name,License,URL
+highline,GPL-2.0-only OR Ruby,https://rubygems.org/gems/highline
+httpclient,Ruby,https://rubygems.org/gems/httpclient
+json,Ruby OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/json
+ruby2_keywords,BSD-2-Clause OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/ruby2_keywords
+rubyzip,BSD-2-Clause OR Ruby,https://rubygems.org/gems/rubyzip
+domain_name,BSD-2-Clause OR (BSD-3-Clause OR MPL-2.0),https://rubygems.org/gems/domain_name
+webrick,BSD-2-Clause OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/webrick
+rexml,BSD-2-Clause,https://rubygems.org/gems/rexml
+optparse,BSD-2-Clause OR Ruby OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/optparse

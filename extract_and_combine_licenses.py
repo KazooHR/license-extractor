@@ -51,12 +51,12 @@ def centralize_licenses(main_directory, filtered, output_file, extract_missing_f
         writer.writerow(["Package Name", "License", "URL"])  # Write header
         writer.writerows(unique_packages.values())
 
-    print(f"Centralized data has been written to {output_filename}")
+    print(f"Combined license data has been written to {output_filename}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Centralize license data from CSV files in subdirectories.")
     parser.add_argument("-d", "--main_directory", default="./repo-sboms/", help="Path to the main directory containing subdirectories. Defaults to the current directory.")
-    parser.add_argument("-u", "--unfiltered", default=False, action='store_false', help="Combine unfiltered License files from subdirectories.") # Use -u for unfiltered
+    parser.add_argument("-u", "--unfiltered", default=False, action='store_false', help="Combine unfiltered License files from subdirectories.")
     parser.add_argument("-o", "--output_file", default="licenses-combined", help="Name of the centralized CSV file to store all data. Defaults to 'licenses_combined.csv'.")
     parser.add_argument("-e", "--extract_missing_files", default=True, action="store_true", help="Extract missing files from subdirectories.")
     args = parser.parse_args()

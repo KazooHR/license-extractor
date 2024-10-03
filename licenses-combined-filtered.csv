@@ -79,6 +79,10 @@ eslint-plugin-promise,ISC,https://npmjs.com/package/eslint-plugin-promise
 electron-to-chromium,ISC,https://npmjs.com/package/electron-to-chromium
 scmp,BSD-3-Clause,https://npmjs.com/package/scmp
 @karimsa/boa,none,https://npmjs.com/package/@karimsa/boa
+flask,BSD-2-Clause,https://pypi.org/project/flask
+python-dotenv,BSD-2-Clause AND BSD-3-Clause,https://pypi.org/project/python-dotenv
+jira,BSD-2-Clause,https://pypi.org/project/jira
+pylint,GPL-2.0-only,https://pypi.org/project/pylint
 best-effort-json-parser,BSD-2-Clause,https://npmjs.com/package/best-effort-json-parser
 text-encoding-utf-8,Unlicense,https://npmjs.com/package/text-encoding-utf-8
 @mergeapi/merge-node-client,none,https://npmjs.com/package/@mergeapi/merge-node-client
@@ -352,15 +356,38 @@ locate-app,SEE LICENSE IN LICENSE,https://npmjs.com/package/locate-app
 esniff,ISC,https://npmjs.com/package/esniff
 es5-ext,ISC,https://npmjs.com/package/es5-ext
 es6-symbol,ISC,https://npmjs.com/package/es6-symbol
+httpclient,Ruby,https://rubygems.org/gems/httpclient
+rexml,BSD-2-Clause,https://rubygems.org/gems/rexml
+unf,BSD-2-Clause,https://rubygems.org/gems/unf
+webrick,BSD-2-Clause OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/webrick
+json,Ruby OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/json
+rubyzip,BSD-2-Clause OR Ruby,https://rubygems.org/gems/rubyzip
+ruby2_keywords,BSD-2-Clause OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/ruby2_keywords
+domain_name,BSD-2-Clause OR (BSD-3-Clause OR MPL-2.0),https://rubygems.org/gems/domain_name
+highline,Ruby,https://rubygems.org/gems/highline
+password-prompt,WTFPL,https://npmjs.com/package/password-prompt
+@oclif/linewrap,ISC,https://npmjs.com/package/@oclif/linewrap
+git-parse,BSD-2-Clause,https://npmjs.com/package/git-parse
+heroku-cli-util,ISC,https://npmjs.com/package/heroku-cli-util
+netrc-parser,ISC,https://npmjs.com/package/netrc-parser
+shelljs,BSD-3-Clause,https://npmjs.com/package/shelljs
+@heroku-cli/color,ISC,https://npmjs.com/package/@heroku-cli/color
+http-call,ISC,https://npmjs.com/package/http-call
+github.com/sdwebimage/libwebp-xcode,LICENSE NOT FOUND,https://github.com/github.com/sdwebimage/libwebp-xcode
+github.com/undefinedlabs/thrift-swift,LICENSE NOT FOUND,https://github.com/github.com/undefinedlabs/thrift-swift
+github.com/onmyway133/smile,LICENSE NOT FOUND,https://github.com/github.com/onmyway133/smile
+github.com/firebase/leveldb,BSD-3-Clause license,https://github.com/github.com/firebase/leveldb
+github.com/firebase/nanopb,Zlib license,https://github.com/github.com/firebase/nanopb
+github.com/cocoalumberjack/cocoalumberjack,BSD-3-Clause license,https://github.com/github.com/cocoalumberjack/cocoalumberjack
+github.com/giphy/giphy-ios-sdk,MPL-2.0 license,https://github.com/github.com/giphy/giphy-ios-sdk
+github.com/microsoft/plcrashreporter,LICENSE NOT FOUND,https://github.com/github.com/microsoft/plcrashreporter
+github.com/apple/swift-system,LICENSE NOT FOUND,https://github.com/github.com/apple/swift-system
+github.com/pendo-io/pendo-mobile-sdk,LICENSE NOT FOUND,https://github.com/github.com/pendo-io/pendo-mobile-sdk
 byebug,BSD-2-Clause,https://rubygems.org/gems/byebug
 dogapi,BSD-3-Clause,https://rubygems.org/gems/dogapi
-httpclient,Ruby,https://rubygems.org/gems/httpclient
 matrix,BSD-2-Clause OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/matrix
 net-pop,BSD-2-Clause OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/net-pop
 promise.rb,Unlicense,https://rubygems.org/gems/promise.rb
-ruby2_keywords,BSD-2-Clause OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/ruby2_keywords
-rubyzip,BSD-2-Clause OR Ruby,https://rubygems.org/gems/rubyzip
-webrick,BSD-2-Clause OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/webrick
 date,Ruby OR BSD-2-Clause,https://rubygems.org/gems/date
 ffi,BSD-3-Clause,https://rubygems.org/gems/ffi
 net-protocol,BSD-2-Clause OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/net-protocol
@@ -374,8 +401,6 @@ sync,BSD-2-Clause,https://rubygems.org/gems/sync
 xmlrpc,BSD-2-Clause OR Ruby OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/xmlrpc
 carmen,N/A,https://rubygems.org/gems/carmen
 thread,WTFPL,https://rubygems.org/gems/thread
-json,Ruby OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/json
-elasticsearch-model,Apache 2,https://rubygems.org/gems/elasticsearch-model
 i18n_tools,N/A,https://rubygems.org/gems/i18n_tools
 mongoid-grid_fs,Ruby,https://rubygems.org/gems/mongoid-grid_fs
 graphql-pro,LICENSE NOT FOUND,https://rubygems.org/gems/graphql-pro
@@ -385,9 +410,7 @@ apipie-rails,N/A,https://rubygems.org/gems/apipie-rails
 net-smtp,Ruby OR BSD-2-Clause,https://rubygems.org/gems/net-smtp
 ruby-prof,BSD-2-Clause,https://rubygems.org/gems/ruby-prof
 puma,BSD-3-Clause,https://rubygems.org/gems/puma
-domain_name,BSD-2-Clause OR (BSD-3-Clause OR MPL-2.0),https://rubygems.org/gems/domain_name
 image_size,Ruby,https://rubygems.org/gems/image_size
-highline,GPL-2.0 AND Ruby,https://rubygems.org/gems/highline
 net-imap,Ruby OR BSD-2-Clause,https://rubygems.org/gems/net-imap
 gpgme,LGPL-2.1+,https://rubygems.org/gems/gpgme
 google-protobuf,BSD-3-Clause,https://rubygems.org/gems/google-protobuf
@@ -398,7 +421,6 @@ pg,BSD-2-Clause,https://rubygems.org/gems/pg
 prawn,"Nonstandard, GPL-2.0-only, GPL-3.0-only",https://rubygems.org/gems/prawn
 datadog-ci,BSD-3-Clause,https://rubygems.org/gems/datadog-ci
 racc,BSD-2-Clause OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/racc
-rexml,BSD-2-Clause,https://rubygems.org/gems/rexml
 ast-types-flow,ISC,https://npmjs.com/package/ast-types-flow
 railroad-diagrams,CC0-1.0,https://npmjs.com/package/railroad-diagrams
 har-schema,ISC,https://npmjs.com/package/har-schema
@@ -448,7 +470,6 @@ staged-git-files,BSD-2-Clause,https://npmjs.com/package/staged-git-files
 clamp-js,WTFPL,https://npmjs.com/package/clamp-js
 d3-sankey,BSD-3-Clause,https://npmjs.com/package/d3-sankey
 cson-parser,BSD-3-Clause,https://npmjs.com/package/cson-parser
-shelljs,BSD-3-Clause,https://npmjs.com/package/shelljs
 detect-node,ISC,https://npmjs.com/package/detect-node
 killable,ISC,https://npmjs.com/package/killable
 fbjs,BSD-3-Clause,https://npmjs.com/package/fbjs
@@ -527,3 +548,36 @@ cint,ISC,https://npmjs.com/package/cint
 spawn-please,ISC,https://npmjs.com/package/spawn-please
 delaunator,ISC,https://npmjs.com/package/delaunator
 nise,BSD-3-Clause,https://npmjs.com/package/nise
+optparse,BSD-2-Clause OR Ruby OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/optparse
+github.com/golang/protobuf,BSD-3-Clause license,github.com/golang/protobuf
+google.golang.org/protobuf,LICENSE NOT FOUND,google.golang.org/protobuf
+github.com/golang/snappy,BSD-3-Clause license,github.com/golang/snappy
+github.com/google/uuid,LICENSE NOT FOUND,github.com/google/uuid
+github.com/klauspost/compress,LICENSE NOT FOUND,github.com/klauspost/compress
+github.com/pierrec/lz4/v4,LICENSE FETCH ERROR,github.com/pierrec/lz4/v4
+cloud.google.com/go/compute/metadata,LICENSE NOT FOUND,cloud.google.com/go/compute/metadata
+github.com/googleapis/gax-go/v2,LICENSE FETCH ERROR,github.com/googleapis/gax-go/v2
+go.opencensus.io,LICENSE NOT FOUND,go.opencensus.io
+golang.org/x/sync,LICENSE NOT FOUND,golang.org/x/sync
+golang.org/x/xerrors,LICENSE NOT FOUND,golang.org/x/xerrors
+google.golang.org/genproto/googleapis/rpc,LICENSE NOT FOUND,google.golang.org/genproto/googleapis/rpc
+google.golang.org/appengine,LICENSE NOT FOUND,google.golang.org/appengine
+github.com/zeebo/xxh3,BSD-2-Clause license,github.com/zeebo/xxh3
+github.com/google/go-cmp,BSD-3-Clause license,github.com/google/go-cmp
+google.golang.org/genproto,LICENSE NOT FOUND,google.golang.org/genproto
+google.golang.org/genproto/googleapis/api,LICENSE NOT FOUND,google.golang.org/genproto/googleapis/api
+golang.org/x/oauth2,LICENSE NOT FOUND,golang.org/x/oauth2
+golang.org/x/net,LICENSE NOT FOUND,golang.org/x/net
+golang.org/x/crypto,LICENSE NOT FOUND,golang.org/x/crypto
+golang.org/x/sys,LICENSE NOT FOUND,golang.org/x/sys
+golang.org/x/text,LICENSE NOT FOUND,golang.org/x/text
+github.com/klauspost/cpuid/v2,LICENSE FETCH ERROR,github.com/klauspost/cpuid/v2
+golang.org/x/tools,LICENSE NOT FOUND,golang.org/x/tools
+golang.org/x/mod,LICENSE NOT FOUND,golang.org/x/mod
+github.com/apache/arrow/go/v12,LICENSE FETCH ERROR,github.com/apache/arrow/go/v12
+cloud.google.com/go/compute,LICENSE NOT FOUND,cloud.google.com/go/compute
+cloud.google.com/go/iam,LICENSE NOT FOUND,cloud.google.com/go/iam
+google.golang.org/api,LICENSE NOT FOUND,google.golang.org/api
+cloud.google.com/go,LICENSE NOT FOUND,cloud.google.com/go
+google.golang.org/grpc,LICENSE NOT FOUND,google.golang.org/grpc
+cloud.google.com/go/bigquery,LICENSE NOT FOUND,cloud.google.com/go/bigquery

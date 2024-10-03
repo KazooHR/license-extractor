@@ -1,1 +1,61 @@
 Package Name,License,URL
+httpclient,Ruby,https://rubygems.org/gems/httpclient
+rexml,BSD-2-Clause,https://rubygems.org/gems/rexml
+unf,BSD-2-Clause,https://rubygems.org/gems/unf
+webrick,BSD-2-Clause OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/webrick
+json,Ruby OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/json
+rubyzip,BSD-2-Clause OR Ruby,https://rubygems.org/gems/rubyzip
+ruby2_keywords,BSD-2-Clause OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/ruby2_keywords
+domain_name,BSD-2-Clause OR (BSD-3-Clause OR MPL-2.0),https://rubygems.org/gems/domain_name
+highline,Ruby,https://rubygems.org/gems/highline
+esprima,BSD-2-Clause,https://npmjs.com/package/esprima
+esutils,BSD-2-Clause,https://npmjs.com/package/esutils
+fs.realpath,ISC,https://npmjs.com/package/fs.realpath
+glob,ISC,https://npmjs.com/package/glob
+inflight,ISC,https://npmjs.com/package/inflight
+inherits,ISC,https://npmjs.com/package/inherits
+isexe,ISC,https://npmjs.com/package/isexe
+once,ISC,https://npmjs.com/package/once
+rimraf,ISC,https://npmjs.com/package/rimraf
+source-map,BSD-3-Clause,https://npmjs.com/package/source-map
+which,ISC,https://npmjs.com/package/which
+wrappy,ISC,https://npmjs.com/package/wrappy
+duplexer3,BSD-3-Clause,https://npmjs.com/package/duplexer3
+glob-parent,ISC,https://npmjs.com/package/glob-parent
+minimatch,ISC,https://npmjs.com/package/minimatch
+source-map,BSD-3-Clause,https://npmjs.com/package/source-map
+password-prompt,WTFPL,https://npmjs.com/package/password-prompt
+@protobufjs/aspromise,BSD-3-Clause,https://npmjs.com/package/@protobufjs/aspromise
+@protobufjs/base64,BSD-3-Clause,https://npmjs.com/package/@protobufjs/base64
+@protobufjs/codegen,BSD-3-Clause,https://npmjs.com/package/@protobufjs/codegen
+@protobufjs/eventemitter,BSD-3-Clause,https://npmjs.com/package/@protobufjs/eventemitter
+@protobufjs/fetch,BSD-3-Clause,https://npmjs.com/package/@protobufjs/fetch
+@protobufjs/float,BSD-3-Clause,https://npmjs.com/package/@protobufjs/float
+@protobufjs/inquire,BSD-3-Clause,https://npmjs.com/package/@protobufjs/inquire
+@protobufjs/path,BSD-3-Clause,https://npmjs.com/package/@protobufjs/path
+@protobufjs/pool,BSD-3-Clause,https://npmjs.com/package/@protobufjs/pool
+@protobufjs/utf8,BSD-3-Clause,https://npmjs.com/package/@protobufjs/utf8
+http-cache-semantics,BSD-2-Clause,https://npmjs.com/package/http-cache-semantics
+@oclif/linewrap,ISC,https://npmjs.com/package/@oclif/linewrap
+signal-exit,ISC,https://npmjs.com/package/signal-exit
+glob-to-regexp,BSD-2-Clause,https://npmjs.com/package/glob-to-regexp
+graceful-fs,ISC,https://npmjs.com/package/graceful-fs
+semver,ISC,https://npmjs.com/package/semver
+graceful-fs,ISC,https://npmjs.com/package/graceful-fs
+git-parse,BSD-2-Clause,https://npmjs.com/package/git-parse
+heroku-cli-util,ISC,https://npmjs.com/package/heroku-cli-util
+netrc-parser,ISC,https://npmjs.com/package/netrc-parser
+shelljs,BSD-3-Clause,https://npmjs.com/package/shelljs
+@heroku-cli/color,ISC,https://npmjs.com/package/@heroku-cli/color
+protobufjs,BSD-3-Clause,https://npmjs.com/package/protobufjs
+http-call,ISC,https://npmjs.com/package/http-call
+github.com/sdwebimage/libwebp-xcode,LICENSE NOT FOUND,https://github.com/github.com/sdwebimage/libwebp-xcode
+github.com/undefinedlabs/thrift-swift,LICENSE NOT FOUND,https://github.com/github.com/undefinedlabs/thrift-swift
+github.com/onmyway133/smile,LICENSE NOT FOUND,https://github.com/github.com/onmyway133/smile
+github.com/firebase/leveldb,BSD-3-Clause license,https://github.com/github.com/firebase/leveldb
+github.com/firebase/nanopb,Zlib license,https://github.com/github.com/firebase/nanopb
+github.com/cocoalumberjack/cocoalumberjack,BSD-3-Clause license,https://github.com/github.com/cocoalumberjack/cocoalumberjack
+github.com/giphy/giphy-ios-sdk,MPL-2.0 license,https://github.com/github.com/giphy/giphy-ios-sdk
+github.com/microsoft/plcrashreporter,LICENSE NOT FOUND,https://github.com/github.com/microsoft/plcrashreporter
+github.com/apple/swift-system,LICENSE NOT FOUND,https://github.com/github.com/apple/swift-system
+github.com/pendo-io/pendo-mobile-sdk,LICENSE NOT FOUND,https://github.com/github.com/pendo-io/pendo-mobile-sdk

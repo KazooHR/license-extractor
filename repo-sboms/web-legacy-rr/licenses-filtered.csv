@@ -22,7 +22,6 @@ xmlrpc,BSD-2-Clause OR Ruby OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems
 carmen,N/A,https://rubygems.org/gems/carmen
 thread,WTFPL,https://rubygems.org/gems/thread
 json,Ruby OR (BSD-2-Clause AND Ruby),https://rubygems.org/gems/json
-elasticsearch-model,Apache 2,https://rubygems.org/gems/elasticsearch-model
 i18n_tools,N/A,https://rubygems.org/gems/i18n_tools
 mongoid-grid_fs,Ruby,https://rubygems.org/gems/mongoid-grid_fs
 graphql-pro,LICENSE NOT FOUND,https://rubygems.org/gems/graphql-pro

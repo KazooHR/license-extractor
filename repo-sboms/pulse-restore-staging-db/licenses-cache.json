@@ -1,0 +1,11 @@
+{
+    "pip:flask": "BSD-2-Clause",
+    "pip:gunicorn": "MIT",
+    "pip:python-dotenv": "BSD-2-Clause AND BSD-3-Clause",
+    "pip:jira": "BSD-2-Clause",
+    "pip:google-cloud-secret-manager": "Apache-2.0",
+    "pip:pylint": "GPL-2.0-only",
+    "pip:pytest": "MIT",
+    "pip:pytest-mock": "MIT",
+    "pip:google-cloud-monitoring": "Apache-2.0"
+}

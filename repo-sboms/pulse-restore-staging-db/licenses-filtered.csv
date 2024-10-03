@@ -1,0 +1,5 @@
+Package Name,License,URL
+flask,BSD-2-Clause,https://pypi.org/project/flask
+python-dotenv,BSD-2-Clause AND BSD-3-Clause,https://pypi.org/project/python-dotenv
+jira,BSD-2-Clause,https://pypi.org/project/jira
+pylint,GPL-2.0-only,https://pypi.org/project/pylint

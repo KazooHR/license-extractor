@@ -55,12 +55,15 @@ def extract_licenses(output_format, base_path, filter_type="filtered"):
                 We need need the actual package name without prefix
                 """
                 package_name_without_prefix = package["name"].split(":", 1)[1]
+                print(f"Fetching license for package: {package_name_without_prefix}")
                 if package["name"].startswith("npm:"):
                     license_concluded = fetch_license_from_npm(package_name_without_prefix)
                 elif package["name"].startswith("rubygems:"):
                     license_concluded = fetch_license_from_rubygems(package_name_without_prefix)
                 elif package["name"].startswith("swift:"):
-                    license_concluded = fetch_license_from_github_for_swift_packages(package_name_without_prefix)
+                    license_concluded = fetch_license_from_github(package_name_without_prefix)
+                elif package["name"].startswith("go:"):
+                    license_concluded = fetch_license_for_go_package(package_name_without_prefix)
                 else:
                     print(f"Unsupported package prefix: {package['name']}")
                     continue  # Skip this package if the prefix is not recognized
@@ -73,8 +76,9 @@ def extract_licenses(output_format, base_path, filter_type="filtered"):
             # Create a dictionary for each package
             package_info = build_package_info(package, license_concluded)
 
-            # Filter for licenses NOT containing "MIT" or "Apache-2.0" if filter_type is "filtered"
-            if filter_type == "unfiltered" or ("MIT" not in license_concluded and "Apache-2.0" not in license_concluded):
+            # Filter for licenses NOT containing MIT or Apache 2 licenses if filter_type is "filtered"
+            apache_licenses = ("MIT", "Apache-2.0", "Apache 2.0", "Apache 2")
+            if filter_type == "unfiltered" or not any(license in license_concluded for license in apache_licenses):
                 filtered_licenses.append(package_info)
 
     # Always write to unfiltered-licenses.json
@@ -149,12 +153,22 @@ def fetch_license_from_rubygems(package_name):
         print(response)
         print(f"Error fetching license for package: {package_name} (URL: {rubygems_url})")
         return LICENSE_FETCH_ERROR
-    
-def fetch_license_from_github_for_swift_packages(package_name):
+
+def fetch_license_for_go_package(package_name):
+    print(f"Fetching license for Go package: {package_name}")
+    if package_name.startswith("github.com"):
+        return fetch_license_from_github(package_name)
+    else:
+        # Go repositories all seem to use the same documentation service
+        # which doesn't have a license field and doesn't seem to have a standard way to get the license
+        error_message = "CANNOT AUTOMATICALLY FETCH LICENSE FOR NON-GITHUB GO PACKAGES"
+        print(f"{package_name}: {error_message}")
+        return error_message
+
+
+def fetch_license_from_github(package_name):
     """
     Fetches license information from GitHub.
-    Swift packages names seem to already be GitHub URLs
-    so all we need to add is the schema
     """
 
     github_package = f"https://{package_name}"
@@ -202,8 +216,11 @@ def build_package_info(package, license_concluded):
     url_formats = {
         "npm:": "https://npmjs.com/package/{package_name}",
         "rubygems:": "https://rubygems.org/gems/{package_name}",
-        "swift": "https://github.com/{package_name}"
-        # Add more mappings here as needed
+        "pip": "https://pypi.org/project/{package_name}",
+        # Swift packages are GitHub URLs
+        "swift": "{package_name}",
+        # Go packages are URLs
+        "go:": "{package_name}"
     }
 
     for prefix, url_format in url_formats.items():
@@ -215,6 +232,7 @@ def build_package_info(package, license_concluded):
         raise ValueError(f"No matching URL format found for package prefix in '{package['name']}'. Does the URL format need to be added to the 'url_formats' dictionary?")
 
     return package_info
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Extract license information from SBOM.")
